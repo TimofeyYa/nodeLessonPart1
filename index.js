@@ -2,25 +2,33 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
+const server = http.createServer((req,res) =>{ 
+    res.writeHead(200, {
+        'Content-Type':'text/html; charset=utf-8'
+    })
 
-let serverData;
+    console.log(path.extname(req.url));
+    let pageName;
+    if (req.url == '/'){
+        pageName = '/main'
+    } else {
+        pageName = req.url;
+    }
 
-const server = http.createServer((req,res) =>{
-    res.write(serverData);
-    res.write('Просто пушка2');
-    res.end();
-})
+    
+    console.log(path.join(__dirname, 'pages', `.${pageName}.html`));
+    if (path.extname(req.url) == ''){
+    fs.readFile(path.join(__dirname, 'pages', `.${pageName}.html`), 
+    'utf-8',
+    (err,data)=>{
+        if (err) throw data;
 
+        res.end(data);
+    })
+    }
 
-fs.readFile(path.join(__dirname, 'refs', 'test.html'),
-'utf-8',
-(err, data) =>{
-    if(err) throw err;
-
-    serverData = data;
-})
-
+    });
 
 server.listen(3000, ()=>{
-    console.log('Server Started...');
+    console.log("server ready!")
 })
